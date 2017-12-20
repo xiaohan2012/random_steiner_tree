@@ -1,11 +1,10 @@
-import sys
 import random
-from interface import loop_erased
+from .interface import loop_erased
 
 
 def random_steiner_tree(gi, X, root, method="loop_erased", seed=None):
     assert method in {"loop_erased", "closure", "cut"}
-    # C++ is strict with typ...
+    # C++ is strict with type...
     X = list(map(int, X))
 
     root = int(root)
@@ -14,4 +13,4 @@ def random_steiner_tree(gi, X, root, method="loop_erased", seed=None):
     if method == "loop_erased":
         return loop_erased(gi, X, root, seed)
     else:
-        raise NotImplemented('')
+        raise NotImplemented('yet')

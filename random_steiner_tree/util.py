@@ -1,4 +1,4 @@
-from interface import build_graph
+from .interface import build_graph
 
 
 def nx2edges_and_weights(g, weight='weight'):

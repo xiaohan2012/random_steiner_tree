@@ -2,8 +2,8 @@ import pytest
 import random
 import numpy as np
 import networkx as nx
-from util import from_nx
 from random_steiner_tree import random_steiner_tree
+from random_steiner_tree.util import from_nx
 
 
 def check_feasiblility(tree, root, X):
