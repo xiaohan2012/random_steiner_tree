@@ -1,31 +1,16 @@
-
 # coding: utf-8
-
-# In[1]:
-
-
-# In[48]:
-
 
 import networkx as nx
 import numpy as np
 import random
-import pandas as pd
 from scipy.spatial.distance import cosine
 from tqdm import tqdm
 from collections import Counter
 from random_steiner_tree import random_steiner_tree
 from random_steiner_tree.util import from_nx
 
-
-# In[55]:
-
-
-nx.florentine_families_graph().number_of_nodes()
+# nx.florentine_families_graph().number_of_nodes()
 # nx.davis_southern_women_graph().number_of_nodes()
-
-
-# In[62]:
 
 
 g = nx.karate_club_graph()
@@ -36,13 +21,7 @@ for u, v in g.edges_iter():
     g[u][v]['weight'] = 1
 
 
-# In[63]:
-
-
 gi = from_nx(g)
-
-
-# In[64]:
 
 
 k = 5
@@ -50,58 +29,21 @@ X = np.random.permutation(g.number_of_nodes())[:k]
 root = random.choice(g.nodes())
 
 
-# In[65]:
-
-
 N = 100000000
-
-
-# In[66]:
-
+# N = 1000
 
 tree_sizes = [len(random_steiner_tree(gi, X, root))
               for i in tqdm(range(N))]
 
-
-# In[67]:
-
-
-df = pd.Series(tree_sizes).to_frame()
-
-
-# In[68]:
-
-
-# df.hist()
-
-
-# In[69]:
-
+# df = pd.Series(tree_sizes).to_frame()
 
 def sort_edges(edges):
     return tuple(sorted(edges))
 
-
-# In[70]:
-
-
-trees = [sort_edges(random_steiner_tree(gi, X, root))
-         for i in tqdm(range(N))]
-
-
-# In[71]:
-
-
-tree_freq = Counter(trees)
-
-
-# In[72]:
-
-
-len(tree_freq)
-
-
-# In[73]:
+tree_freq = Counter()
+for i in tqdm(range(N)):
+    edges = sort_edges(random_steiner_tree(gi, X, root))
+    tree_freq[edges] += 1
 
 
 def tree_proba(edges):
@@ -109,21 +51,12 @@ def tree_proba(edges):
     return 1 / prod
 
 
-# In[74]:
-
-
 probas = np.array([tree_proba(t)
                    for t in tqdm(tree_freq.keys(),
                                  total=len(tree_freq.keys()))])
 
 
-# In[75]:
-
-
 actual_probas = np.array(list(tree_freq.values())) / N
-
-
-# In[76]:
 
 
 print('using {} samples on {} terminals, the cosine similarity is {}'.format(
