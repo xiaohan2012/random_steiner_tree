@@ -63,7 +63,7 @@ std::string graph_to_string(Graph &g){
 }
 
 
-boost::python::list get_random_steiner_tree(Graph & g, boost::python::list terminals, int root, int seed){
+boost::python::list loop_erased(Graph & g, boost::python::list terminals, int root, int seed){
   long length = len(terminals);
   std::vector<Vertex> X(length);
   for(long i=0; i<length; i++){
@@ -97,8 +97,8 @@ boost::python::list get_random_steiner_tree(Graph & g, boost::python::list termi
   std::pair<vertex_iter, vertex_iter> vp;
   for (vp = boost::vertices(g); vp.first != vp.second; ++vp.first){
     Vertex target= (*vp.first);
-    // it's root or has some predecessor
-    if(target == (Vertex)root || predmap[target] != boost::graph_traits<Graph>::null_vertex())
+    // store visited edges
+    if(predmap[target] != boost::graph_traits<Graph>::null_vertex())
       l.append(boost::python::make_tuple((int)predmap[target], target));
   }
 
@@ -117,5 +117,5 @@ BOOST_PYTHON_MODULE(interface) {
   class_<Graph>("Graph");
   def("build_graph", build_graph);
   def("graph_to_string", graph_to_string);
-  def("get_random_steiner_tree", get_random_steiner_tree);
+  def("loop_erased", loop_erased);
 };
