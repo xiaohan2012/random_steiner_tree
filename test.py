@@ -42,3 +42,18 @@ def test_loop_erased_feasiblility(input_data):
             t = nx.Graph()
             t.add_edges_from(tree_edges)
             check_feasiblility(t, root, X)
+
+
+@pytest.mark.parametrize("method", ["loop_erased", "cut"])
+def test_feasiblility(input_data, method):
+    g, gi = input_data
+    for i in range(10):
+        # try different number of terminals1
+        for k in range(2, g.number_of_nodes()+1):
+            X = np.random.permutation(g.number_of_nodes())[:10]
+            root = random.choice(g.nodes())
+            tree_edges = random_steiner_tree(gi, X, root, method=method)
+            t = nx.Graph()
+            t.add_edges_from(tree_edges)
+            check_feasiblility(t, root, X)
+            
