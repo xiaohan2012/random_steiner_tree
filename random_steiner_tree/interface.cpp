@@ -17,7 +17,7 @@
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/random_number_generator.hpp>
 
-#include "core.cpp"
+#include "loop_erased.cpp"
 
 
 // Define a directed graph type that associates a weight with each
