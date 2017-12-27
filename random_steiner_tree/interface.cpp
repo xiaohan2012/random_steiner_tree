@@ -84,13 +84,13 @@ boost::python::list loop_erased(Graph & g, boost::python::list terminals, int ro
 
   std::mt19937 prng { seed }; // as simple as this, fanculo!!!
 
-  random_steiner_tree(g,
-		      X,
-		      prng,
-		      (Vertex) root,
-		      boost::make_iterator_property_map(predmap.begin(), get(boost::vertex_index, g)),
-		      weightmap,
-		      boost::make_iterator_property_map(colormap.begin(), get(boost::vertex_index, g)));
+  loop_erased_random_steiner_tree(g,
+				  X,
+				  prng,
+				  (Vertex) root,
+				  boost::make_iterator_property_map(predmap.begin(), get(boost::vertex_index, g)),
+				  weightmap,
+				  boost::make_iterator_property_map(colormap.begin(), get(boost::vertex_index, g)));
   
   boost::python::list l;
   typedef boost::graph_traits<Graph>::vertex_iterator vertex_iter;
