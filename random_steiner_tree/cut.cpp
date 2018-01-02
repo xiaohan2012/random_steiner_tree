@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <vector>
+
 #include <boost/assert.hpp>
 #include <boost/graph/loop_erased_random_walk.hpp>
 #include <boost/graph/random.hpp>
