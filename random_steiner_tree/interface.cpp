@@ -47,6 +47,48 @@ Graph build_graph(int N, boost::python::list edge_with_weights){
   return g;
 }
 
+int num_vertices(Graph &g){
+  return boost::num_vertices(g);
+}
+
+void isolate_vertex(Graph &g, int v){
+  // to keep the nodes, remove only the adjacent edges
+  Graph::out_edge_iterator eit, eend;
+  std::tie(eit, eend) = boost::out_edges((Vertex) v, g);
+  std::vector<Edge> edges_to_remove; // collect the edges
+  std::for_each(eit, eend,
+  		[&g, &edges_to_remove](Edge e)
+  		{
+  		  // boost::remove_edge(e, g);
+  		  edges_to_remove.push_back(e);
+  		});
+  // for(; eit < eend; eit++)
+  //   edges_to_remove.push_back(*eit);
+  for(auto e: edges_to_remove)
+    boost::remove_edge(e, g);
+}
+
+void remove_disconnected_nodes(Graph &g, int pivot){
+  // given pivot node, traverse from it using BFS and remove nodes that are not traversed
+  unsigned int N = num_vertices(g);
+  std::vector<Vertex> predecessors (N, boost::graph_traits<Graph>::null_vertex());
+
+  // predecessors.fill(-1);
+  boost::breadth_first_search(g, pivot,
+      boost::visitor(
+		     boost::make_bfs_visitor(
+					     boost::record_predecessors(boost::make_iterator_property_map(predecessors.begin(), get(boost::vertex_index, g)),
+									boost::on_tree_edge{})
+					     )));
+  for(unsigned int i=0; i<N; i++){
+    if(pivot == (int)i) continue;
+    if(predecessors[i] == boost::graph_traits<Graph>::null_vertex()) // not visited / disconnected
+      isolate_vertex(g, i);
+      // boost::remove_vertex((Vertex) i, g);
+  }
+  
+}
+
 std::string graph_to_string(Graph &g){
     boost::property_map<Graph, boost::edge_weight_t>::type weights =
         get(boost::edge_weight_t(), g);
@@ -63,6 +105,14 @@ std::string graph_to_string(Graph &g){
     return ss.str();;
 }
 
+boost::python::list _vertices(Graph & g){
+  boost::python::list nodes;
+  std::pair<Graph::vertex_iterator,
+	    Graph::vertex_iterator> vs = vertices(g);
+  for(Graph::vertex_iterator it=vs.first; it<vs.second; it++)
+    nodes.append((int)*it);
+  return nodes;
+}
 
 boost::python::list loop_erased(Graph & g, boost::python::list terminals, int root, int seed){
   long length = len(terminals);
@@ -145,6 +195,10 @@ BOOST_PYTHON_MODULE(interface) {
   class_<Graph>("Graph");
   def("build_graph", build_graph);
   def("graph_to_string", graph_to_string);
+  def("num_vertices", num_vertices);
+  def("isolate_vertex", isolate_vertex);
+  def("remove_disconnected_nodes", remove_disconnected_nodes);
+  def("vertices", _vertices);
   def("loop_erased", loop_erased);
   def("cut_based", cut_based);    
 };

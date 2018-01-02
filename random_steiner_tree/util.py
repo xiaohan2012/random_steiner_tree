@@ -1,4 +1,8 @@
-from .interface import build_graph
+from .interface import (build_graph,
+                        isolate_vertex,
+                        vertices,
+                        num_vertices,
+                        remove_disconnected_nodes)
 
 
 def nx2edges_and_weights(g, weight='weight'):

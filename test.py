@@ -4,7 +4,11 @@ import numpy as np
 import networkx as nx
 from graph_tool import Graph
 from random_steiner_tree import random_steiner_tree
-from random_steiner_tree.util import from_nx, from_gt
+from random_steiner_tree.util import (from_nx, from_gt,
+                                      num_vertices,
+                                      isolate_vertex,
+                                      vertices,
+                                      remove_disconnected_nodes)
 
 
 def check_feasiblility(tree, root, X):
@@ -64,4 +68,35 @@ def test_feasiblility(data_type, method):
             t = nx.Graph()
             t.add_edges_from(tree_edges)
             check_feasiblility(t, root, X)
-            
+
+
+def test_isolate_vertex():
+    _, gi, _ = input_data_gt()
+    prev_N = num_vertices(gi)
+    isolate_vertex(gi, 0)
+    assert prev_N == num_vertices(gi)
+    isolate_vertex(gi, 1)
+    assert prev_N == num_vertices(gi)
+
+
+def test_remove_vertex_node_index():
+    g = nx.Graph()
+    g.add_nodes_from([0, 1, 2, 3, 4])
+    g.add_edges_from([(0, 1), (1, 2), (3, 4)])
+    gi = from_nx(g)
+    isolate_vertex(gi, 0)
+    assert set(vertices(gi)) == {0, 1, 2, 3, 4}
+
+    
+# @pytest.mark.parametrize("pivot", [1, 3])
+@pytest.mark.parametrize("expected, pivot", [({0, 1, 2}, 1), ({3, 4}, 3)])
+def test_maintain_connected_component(expected, pivot):
+    g = nx.Graph()
+    g.add_nodes_from([0, 1, 2, 3, 4])
+    g.add_edges_from([(0, 1), (1, 2), (3, 4)])
+    gi = from_nx(g)
+
+    remove_disconnected_nodes(gi, pivot)
+    print('num_vertices', num_vertices(gi))
+    # 0, 1, 2 remains
+    assert set(vertices(gi)) == expected
