@@ -8,7 +8,7 @@ from random_steiner_tree.util import (from_nx, from_gt,
                                       num_vertices,
                                       isolate_vertex,
                                       vertices,
-                                      remove_disconnected_nodes)
+                                      reachable_vertices)
 
 
 def check_feasiblility(tree, root, X):
@@ -70,7 +70,7 @@ def test_feasiblility(data_type, method):
             check_feasiblility(t, root, X)
 
 
-def test_isolate_vertex():
+def test_isolate_vertex_num_verticesx():
     _, gi, _ = input_data_gt()
     prev_N = num_vertices(gi)
     isolate_vertex(gi, 0)
@@ -79,24 +79,35 @@ def test_isolate_vertex():
     assert prev_N == num_vertices(gi)
 
 
-def test_remove_vertex_node_index():
+@pytest.fixture
+def disconnected_line_graph():
     g = nx.Graph()
     g.add_nodes_from([0, 1, 2, 3, 4])
     g.add_edges_from([(0, 1), (1, 2), (3, 4)])
-    gi = from_nx(g)
+    return from_nx(g)
+
+
+def test_remove_vertex_node_index(disconnected_line_graph):
+    gi = disconnected_line_graph
     isolate_vertex(gi, 0)
     assert set(vertices(gi)) == {0, 1, 2, 3, 4}
+
+    assert reachable_vertices(gi, 0) == [0]
+    assert reachable_vertices(gi, 1) == [1, 2]
+    assert reachable_vertices(gi, 3) == [3, 4]
 
     
 # @pytest.mark.parametrize("pivot", [1, 3])
 @pytest.mark.parametrize("expected, pivot", [({0, 1, 2}, 1), ({3, 4}, 3)])
-def test_maintain_connected_component(expected, pivot):
-    g = nx.Graph()
-    g.add_nodes_from([0, 1, 2, 3, 4])
-    g.add_edges_from([(0, 1), (1, 2), (3, 4)])
-    gi = from_nx(g)
-
-    remove_disconnected_nodes(gi, pivot)
+def test_reachable_vertices(disconnected_line_graph, expected, pivot):
+    gi = disconnected_line_graph
+    nodes = reachable_vertices(gi, pivot)
     print('num_vertices', num_vertices(gi))
     # 0, 1, 2 remains
-    assert set(vertices(gi)) == expected
+    assert set(nodes) == expected
+
+
+def test_steiner_tree_with_disconnected_component(disconnected_line_graph):
+    gi = disconnected_line_graph
+    edges = random_steiner_tree(gi, X=[0, 2], root=1, method='loop_erased')
+    assert set(edges) == {(1, 0), (1, 2)}

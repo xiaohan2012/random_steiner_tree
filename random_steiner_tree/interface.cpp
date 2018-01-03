@@ -68,8 +68,8 @@ void isolate_vertex(Graph &g, int v){
     boost::remove_edge(e, g);
 }
 
-void remove_disconnected_nodes(Graph &g, int pivot){
-  // given pivot node, traverse from it using BFS and remove nodes that are not traversed
+boost::python::list reachable_vertices(Graph &g, int pivot){
+  // given pivot node, traverse from it using BFS and collect nodes that are traversed
   unsigned int N = num_vertices(g);
   std::vector<Vertex> predecessors (N, boost::graph_traits<Graph>::null_vertex());
 
@@ -80,13 +80,12 @@ void remove_disconnected_nodes(Graph &g, int pivot){
 					     boost::record_predecessors(boost::make_iterator_property_map(predecessors.begin(), get(boost::vertex_index, g)),
 									boost::on_tree_edge{})
 					     )));
+  boost::python::list nodes;
   for(unsigned int i=0; i<N; i++){
-    if(pivot == (int)i) continue;
-    if(predecessors[i] == boost::graph_traits<Graph>::null_vertex()) // not visited / disconnected
-      isolate_vertex(g, i);
-      // boost::remove_vertex((Vertex) i, g);
+    if(pivot == (int)i || predecessors[i] != boost::graph_traits<Graph>::null_vertex()) // visited
+      nodes.append((int) i);
   }
-  
+  return nodes;
 }
 
 std::string graph_to_string(Graph &g){
@@ -197,7 +196,7 @@ BOOST_PYTHON_MODULE(interface) {
   def("graph_to_string", graph_to_string);
   def("num_vertices", num_vertices);
   def("isolate_vertex", isolate_vertex);
-  def("remove_disconnected_nodes", remove_disconnected_nodes);
+  def("reachable_vertices", reachable_vertices);
   def("vertices", _vertices);
   def("loop_erased", loop_erased);
   def("cut_based", cut_based);    
