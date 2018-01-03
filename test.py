@@ -11,7 +11,7 @@ from random_steiner_tree.util import (from_nx, from_gt,
                                       reachable_vertices)
 
 
-def check_feasiblility(tree, root, X):
+def check_feasiblity(tree, root, X):
     X = set(X) | {int(root)}
     # number of components
     ncc = nx.number_connected_components(tree)
@@ -67,7 +67,7 @@ def test_feasiblility(data_type, method):
             tree_edges = random_steiner_tree(gi, X, root, method=method)
             t = nx.Graph()
             t.add_edges_from(tree_edges)
-            check_feasiblility(t, root, X)
+            check_feasiblity(t, root, X)
 
 
 def test_isolate_vertex_num_verticesx():
@@ -97,7 +97,6 @@ def test_remove_vertex_node_index(disconnected_line_graph):
     assert reachable_vertices(gi, 3) == [3, 4]
 
     
-# @pytest.mark.parametrize("pivot", [1, 3])
 @pytest.mark.parametrize("expected, pivot", [({0, 1, 2}, 1), ({3, 4}, 3)])
 def test_reachable_vertices(disconnected_line_graph, expected, pivot):
     gi = disconnected_line_graph
@@ -107,7 +106,8 @@ def test_reachable_vertices(disconnected_line_graph, expected, pivot):
     assert set(nodes) == expected
 
 
-def test_steiner_tree_with_disconnected_component(disconnected_line_graph):
+@pytest.mark.parametrize("method", ['cut', 'loop_erased'])
+def test_steiner_tree_with_disconnected_component(disconnected_line_graph, method):
     gi = disconnected_line_graph
-    edges = random_steiner_tree(gi, X=[0, 2], root=1, method='loop_erased')
+    edges = random_steiner_tree(gi, X=[0, 2], root=1, method=method)
     assert set(edges) == {(1, 0), (1, 2)}

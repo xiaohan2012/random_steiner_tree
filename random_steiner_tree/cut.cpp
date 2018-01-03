@@ -23,6 +23,8 @@
 
 #include <boost/graph/random_spanning_tree.hpp>
 
+#include "loop_erased.cpp"
+
 namespace boost {
 
   namespace detail {
@@ -39,11 +41,31 @@ namespace boost {
 						PredMap pred,
 						ColorMap color,
 						NextEdge next_edge){
+      typedef typename graph_traits<Graph>::vertex_descriptor Vertex;
+      // 1. retrieve reachable node set starting from s
 
-      random_spanning_tree_internal(g, s, pred, color, next_edge);
+      std::vector<Vertex> reachable;
+      unsigned int N = num_vertices(g);
+      std::vector<Vertex> predecessors (N, boost::graph_traits<Graph>::null_vertex());
+
+      boost::breadth_first_search(g, s,
+				  boost::visitor(
+						 boost::make_bfs_visitor(
+									 boost::record_predecessors(boost::make_iterator_property_map(predecessors.begin(), get(boost::vertex_index, g)),
+												    boost::on_tree_edge{})
+									 )));
+      for(unsigned int i=0; i<N; i++){
+	if((int)s == (int)i || predecessors[i] != boost::graph_traits<Graph>::null_vertex()) // visited
+	  reachable.push_back((Vertex) i);
+      }
+
+      // 2. get the spanning tree on the reachable set
+      loop_erased_random_steiner_tree_internal(g, reachable, s, pred, color, next_edge);
+
+      // random_spanning_tree_internal(g, s, pred, color, next_edge);
       // std::cout << "spanning tree built" << std::endl;
 
-      // cut the tree 
+      // 3. cut the tree 
       // traverse from terminals to the root and mark visited nodes
       std::vector<bool> visited(num_vertices(g), false);
       visited[s] = true;

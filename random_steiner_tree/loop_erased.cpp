@@ -28,11 +28,11 @@ namespace boost {
     // Algorithm is from http://en.wikipedia.org/wiki/Uniform_spanning_tree
     template <typename Graph, typename PredMap, typename ColorMap, typename NextEdge>
     void loop_erased_random_steiner_tree_internal(const Graph& g,
-				      std::vector<typename graph_traits<Graph>::vertex_descriptor> X, 
-				      typename graph_traits<Graph>::vertex_descriptor s,       
-				      PredMap pred,
-				      ColorMap color,
-				      NextEdge next_edge) {
+						  std::vector<typename graph_traits<Graph>::vertex_descriptor> X, 
+						  typename graph_traits<Graph>::vertex_descriptor s,       
+						  PredMap pred,
+						  ColorMap color,
+						  NextEdge next_edge) {
       typedef typename graph_traits<Graph>::vertex_descriptor vertex_descriptor;
 
       BOOST_ASSERT (num_vertices(g) >= 1); // g must also be undirected (or symmetric) and connected
