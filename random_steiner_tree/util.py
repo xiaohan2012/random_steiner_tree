@@ -1,9 +1,9 @@
-from .interface import (build_graph,
-                        isolate_vertex,
-                        vertices,
-                        edges,
-                        num_vertices,
-                        reachable_vertices)
+from random_steiner_tree.interface import (build_graph,
+                                           isolate_vertex,
+                                           vertices,
+                                           edges,
+                                           num_vertices,
+                                           reachable_vertices)
 
 
 def nx2edges_and_weights(g, weight='weight'):

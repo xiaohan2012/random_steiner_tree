@@ -15,7 +15,7 @@ core_module = Extension(
     sources=['random_steiner_tree/interface.cpp']
 )
 
-setup(name='pyedmond',
+setup(name='rand_steiner_tree',
       version='0.1',
       description='Random Steiner tree sampling algorithm',
       url='http://github.com/xiaohan2012/random_steiner_tree',
