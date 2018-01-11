@@ -1,6 +1,7 @@
 from .interface import (build_graph,
                         isolate_vertex,
                         vertices,
+                        edges,
                         num_vertices,
                         reachable_vertices)
 

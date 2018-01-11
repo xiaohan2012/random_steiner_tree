@@ -52,6 +52,8 @@ int num_vertices(Graph &g){
 }
 
 void isolate_vertex(Graph &g, int v){
+  std::cout << "CPP: remove node " << v << std::endl;
+  
   // to keep the nodes, remove only the adjacent edges
   Graph::out_edge_iterator eit, eend;
   std::tie(eit, eend) = boost::out_edges((Vertex) v, g);
@@ -62,6 +64,7 @@ void isolate_vertex(Graph &g, int v){
   		  // boost::remove_edge(e, g);
   		  edges_to_remove.push_back(e);
   		});
+  std::cout << "CPP: num. edges to remove " << edges_to_remove.size() << std::endl;
   // for(; eit < eend; eit++)
   //   edges_to_remove.push_back(*eit);
   for(auto e: edges_to_remove)
@@ -102,6 +105,16 @@ std::string graph_to_string(Graph &g){
     }
   
     return ss.str();;
+}
+
+boost::python::list _edges(Graph &g){
+  boost::python::list tuples;
+  BOOST_FOREACH (Edge e, edges(g))
+    {
+      tuples.append(boost::python::make_tuple((int)boost::source(e, g),
+					     (int)boost::target(e, g)));
+    }
+  return tuples;
 }
 
 boost::python::list _vertices(Graph & g){
@@ -198,6 +211,7 @@ BOOST_PYTHON_MODULE(interface) {
   def("isolate_vertex", isolate_vertex);
   def("reachable_vertices", reachable_vertices);
   def("vertices", _vertices);
+  def("edges", _edges);
   def("loop_erased", loop_erased);
   def("cut_based", cut_based);    
 };
