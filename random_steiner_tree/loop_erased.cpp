@@ -7,6 +7,7 @@
 #define BOOST_GRAPH_LOOP_ERASED_RANDOM_STEINER_TREE_HPP
 
 #include <vector>
+#include <time.h> 
 #include <boost/assert.hpp>
 #include <boost/graph/loop_erased_random_walk.hpp>
 #include <boost/graph/random.hpp>
@@ -45,8 +46,11 @@ namespace boost {
       put(color, s, color_gen::black());
       put(pred, s, graph_traits<Graph>::null_vertex());
 
+      // clock_t t;
       // BGL_FORALL_VERTICES_T(v, g, Graph) {
+      // std::cout << "root is " << (int)s << std::endl;
       for(auto v: X) {
+	// t = clock();
         if (get(color, v) != color_gen::white()) continue;
         loop_erased_random_walk(g, v, next_edge, color, path);
         for (typename std::vector<vertex_descriptor>::const_reverse_iterator i = path.rbegin();
@@ -59,7 +63,11 @@ namespace boost {
           put(color, *j, color_gen::black());
           put(pred, *j, *i);
         }
+	// t = clock() - t;
+	// std::cout << "CPP: connecting node {" << v << "} took {" << (float) t / CLOCKS_PER_SEC << "} secs" << std::endl;
       }
+      // std::cout << std::endl;
+      // std::cout << std::endl;
     }
   }
 

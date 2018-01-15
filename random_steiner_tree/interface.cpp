@@ -52,9 +52,30 @@ int num_vertices(Graph &g){
 }
 
 void isolate_vertex(Graph &g, int v){
+  /*
+    strange lessons:
+    - if using remove_edge(edge, g), it might throw segmentation fault
+    - using remove_edge(u, v, g) then works
+  */
+  // std::cout << "NEW, CPP: remove node " << v << std::endl;
+  
+  Graph::out_edge_iterator eit, eend;
+  std::tie(eit, eend) = boost::out_edges((Vertex) v, g);
+  std::vector<int> nbrs; // collect the edges
+  std::for_each(eit, eend,
+  		[&g, &nbrs](Edge e)
+  		{
+  		  // boost::remove_edge(e, g);
+  		  nbrs.push_back((int)boost::target(e, g));
+  		});
+  // std::cout << "CPP: num. edges to remove " << nbrs.size() << std::endl;
+  for(auto n: nbrs)
+    boost::remove_edge(v, n, g);
+}
+
+void isolate_vertex_old(Graph &g, int v){
   std::cout << "CPP: remove node " << v << std::endl;
   
-  // to keep the nodes, remove only the adjacent edges
   Graph::out_edge_iterator eit, eend;
   std::tie(eit, eend) = boost::out_edges((Vertex) v, g);
   std::vector<Edge> edges_to_remove; // collect the edges
@@ -65,11 +86,10 @@ void isolate_vertex(Graph &g, int v){
   		  edges_to_remove.push_back(e);
   		});
   std::cout << "CPP: num. edges to remove " << edges_to_remove.size() << std::endl;
-  // for(; eit < eend; eit++)
-  //   edges_to_remove.push_back(*eit);
   for(auto e: edges_to_remove)
     boost::remove_edge(e, g);
 }
+
 
 boost::python::list reachable_vertices(Graph &g, int pivot){
   // given pivot node, traverse from it using BFS and collect nodes that are traversed
@@ -157,14 +177,9 @@ boost::python::list loop_erased(Graph & g, boost::python::list terminals, int ro
     if(predmap[target] != boost::graph_traits<Graph>::null_vertex())
       l.append(boost::python::make_tuple((int)predmap[target], target));
   }
-
-  // BOOST_FOREACH(Edge e, branching){
-  //   int source = (int)boost::source(e, g);
-  //   int target = (int)boost::target(e, g);
-  //   l.append(boost::python::make_tuple(source, target));
-  // }
   return l;  
 }
+
 
 boost::python::list cut_based(Graph & g, boost::python::list terminals, int root, int seed){
   long length = len(terminals);
