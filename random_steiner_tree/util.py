@@ -3,7 +3,8 @@ from random_steiner_tree.interface import (build_graph,
                                            vertices,
                                            edges,
                                            num_vertices,
-                                           reachable_vertices)
+                                           reachable_vertices,
+                                           graph_to_string)
 
 
 def nx2edges_and_weights(g, weight='weight'):
