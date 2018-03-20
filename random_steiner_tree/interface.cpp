@@ -27,7 +27,7 @@
 typedef boost::property<boost::edge_weight_t, double>       EdgeProperty;
 typedef boost::adjacency_list<boost::listS,
                               boost::vecS,
-                              boost::undirectedS,
+                              boost::directedS,
                               boost::no_property,
                               EdgeProperty>                 Graph;
 typedef boost::graph_traits<Graph>::vertex_descriptor       Vertex;

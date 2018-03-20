@@ -38,7 +38,7 @@ def input_data_nx():
 
 def input_data_gt():
     g_nx = nx.karate_club_graph()
-    g = Graph(directed=False)
+    g = Graph(directed=True)
     g.add_vertex(g_nx.number_of_nodes())
     for u, v in g_nx.edges():
         g.add_edge(u, v)
@@ -70,12 +70,16 @@ def test_feasiblility(data_type, method):
             t.add_edges_from(tree_edges)
             check_feasiblity(t, root, X)
 
+
 def test_edges():
-    g = Graph(directed=False)
+    g = Graph(directed=True)
     g.add_edge(0, 1)
+    g.add_edge(1, 0)
     g.add_edge(1, 2)
+    g.add_edge(2, 1)
     gi = from_gt(g, None)
-    assert edges(gi) == [(0, 1), (1, 2)]
+    assert set(edges(gi)) == {(0, 1), (1, 0), (1, 2), (2, 1)}
+
 
 def test_isolate_vertex_num_verticesx():
     _, gi, _ = input_data_gt()
@@ -118,5 +122,3 @@ def test_steiner_tree_with_disconnected_component(disconnected_line_graph, metho
     gi = disconnected_line_graph
     edges = random_steiner_tree(gi, X=[0, 2], root=1, method=method)
     assert set(edges) == {(1, 0), (1, 2)}
-
-    
