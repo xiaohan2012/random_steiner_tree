@@ -69,8 +69,10 @@ void isolate_vertex(Graph &g, int v){
   		  nbrs.push_back((int)boost::target(e, g));
   		});
   // std::cout << "CPP: num. edges to remove " << nbrs.size() << std::endl;
-  for(auto n: nbrs)
+  for(auto n: nbrs) {
     boost::remove_edge(v, n, g);
+    boost::remove_edge(n, v, g);
+  }
 }
 
 void isolate_vertex_old(Graph &g, int v){
