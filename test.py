@@ -71,20 +71,37 @@ def test_feasiblility(data_type, method):
             check_feasiblity(t, root, X)
 
 
-def test_edges():
+@pytest.fixture
+def line_g():
     g = Graph(directed=True)
     g.add_edge(0, 1)
     g.add_edge(1, 0)
     g.add_edge(1, 2)
     g.add_edge(2, 1)
-    gi = from_gt(g, None)
+    return g
+
+
+def test_edges(line_g):
+    gi = from_gt(line_g, None)
     assert set(edges(gi)) == {(0, 1), (1, 0), (1, 2), (2, 1)}
 
 
-def test_isolate_vertex_num_verticesx():
+def test_isolate_vertex(line_g):
+    gi = from_gt(line_g, None)
+    isolate_vertex(gi, 0)
+    assert set(edges(gi)) == {(2, 1), (1, 2)}
+
+    isolate_vertex(gi, 1)
+    assert set(edges(gi)) == set()
+
+        
+def test_isolate_vertex_num_vertices():
     _, gi, _ = input_data_gt()
     prev_N = num_vertices(gi)
     isolate_vertex(gi, 0)
+    nodes_with_edges = {u for e in edges(gi) for u in e}
+    assert 0 not in nodes_with_edges
+
     assert prev_N == num_vertices(gi)
     isolate_vertex(gi, 1)
     assert prev_N == num_vertices(gi)
