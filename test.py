@@ -29,10 +29,10 @@ def check_feasiblity(tree, root, X):
 
 
 def input_data_nx():
-    g = nx.karate_club_graph()
+    g = nx.karate_club_graph().to_directed()
+    
     for u, v in g.edges_iter():
         g[u][v]['weight'] = 1
-
     return g, from_nx(g, 'weight'), g.number_of_nodes()
 
 
@@ -42,11 +42,12 @@ def input_data_gt():
     g.add_vertex(g_nx.number_of_nodes())
     for u, v in g_nx.edges():
         g.add_edge(u, v)
+        g.add_edge(v, u)  # the other direction
 
     return g, from_gt(g, None), g.num_vertices()
 
 
-@pytest.mark.parametrize("data_type", ["nx", "gt"])
+@pytest.mark.parametrize("data_type", ["gt", "nx"])
 @pytest.mark.parametrize("method", ["loop_erased", "cut"])
 def test_feasiblility(data_type, method):
     if data_type == 'nx':
@@ -65,7 +66,7 @@ def test_feasiblility(data_type, method):
                 nodes = list(map(int, g.vertices()))
 
             root = random.choice(nodes)
-            tree_edges = random_steiner_tree(gi, X, root, method=method)
+            tree_edges = random_steiner_tree(gi, X, root, method=method, verbose=True)
             t = nx.Graph()
             t.add_edges_from(tree_edges)
             check_feasiblity(t, root, X)
@@ -109,9 +110,12 @@ def test_isolate_vertex_num_vertices():
 
 @pytest.fixture
 def disconnected_line_graph():
+    """0 -- 1 -- 2    3 -- 4
+    """
     g = nx.Graph()
     g.add_nodes_from([0, 1, 2, 3, 4])
     g.add_edges_from([(0, 1), (1, 2), (3, 4)])
+    g = g.to_directed()
     return from_nx(g)
 
 

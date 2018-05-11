@@ -40,7 +40,8 @@ namespace boost {
 						typename graph_traits<Graph>::vertex_descriptor s,       
 						PredMap pred,
 						ColorMap color,
-						NextEdge next_edge){
+						NextEdge next_edge,
+						bool verbose){
       typedef typename graph_traits<Graph>::vertex_descriptor Vertex;
       // 1. retrieve reachable node set starting from s
 
@@ -60,7 +61,7 @@ namespace boost {
       }
 
       // 2. get the spanning tree on the reachable set
-      loop_erased_random_steiner_tree_internal(g, reachable, s, pred, color, next_edge);
+      loop_erased_random_steiner_tree_internal(g, reachable, s, pred, color, next_edge, verbose);
 
       // random_spanning_tree_internal(g, s, pred, color, next_edge);
       // std::cout << "spanning tree built" << std::endl;
@@ -93,33 +94,36 @@ namespace boost {
 
   template <typename Graph, typename Gen, typename PredMap, typename ColorMap>
   void cut_based_random_steiner_tree(const Graph& g,
-  			   std::vector<typename graph_traits<Graph>::vertex_descriptor> X,
-  			   Gen& gen,
-  			   typename graph_traits<Graph>::vertex_descriptor root,
-  			   PredMap pred,
-  			   static_property_map<double>,
-  			   ColorMap color) {
+				     std::vector<typename graph_traits<Graph>::vertex_descriptor> X,
+				     Gen& gen,
+				     typename graph_traits<Graph>::vertex_descriptor root,
+				     PredMap pred,
+				     static_property_map<double>,
+				     ColorMap color,
+				     bool verbose) {
     unweighted_random_out_edge_gen<Graph, Gen> random_oe(gen);
-    detail::cut_based_random_steiner_tree_internal(g, X, root, pred, color, random_oe);
+    detail::cut_based_random_steiner_tree_internal(g, X, root, pred, color, random_oe, verbose);
   }
 
   // Compute a weight-distributed spanning tree on a graph.
   template <typename Graph, typename Gen, typename PredMap, typename WeightMap, typename ColorMap>
   void cut_based_random_steiner_tree(const Graph& g,
-			   std::vector<typename graph_traits<Graph>::vertex_descriptor> X,
-			   Gen& gen,
-			   typename graph_traits<Graph>::vertex_descriptor root,
-			   PredMap pred,
-			   WeightMap weight,
-			   ColorMap color) {
+				     std::vector<typename graph_traits<Graph>::vertex_descriptor> X,
+				     Gen& gen,
+				     typename graph_traits<Graph>::vertex_descriptor root,
+				     PredMap pred,
+				     WeightMap weight,
+				     ColorMap color,
+				     bool verbose) {
     weighted_random_out_edge_gen<Graph, WeightMap, Gen> random_oe(weight, gen);
-    detail::cut_based_random_steiner_tree_internal(g, X, root, pred, color, random_oe);
+    detail::cut_based_random_steiner_tree_internal(g, X, root, pred, color, random_oe, verbose);
   }
 
   template <typename Graph, typename Gen, typename P, typename T, typename R>
   void cut_based_random_steiner_tree(const Graph& g,
-  			   std::vector<typename graph_traits<Graph>::vertex_descriptor> X,
-  			   Gen& gen, const bgl_named_params<P, T, R>& params) {
+				     std::vector<typename graph_traits<Graph>::vertex_descriptor> X,
+				     Gen& gen, const bgl_named_params<P, T, R>& params,
+				     bool verbose) {
     using namespace boost::graph::keywords;
     typedef bgl_named_params<P, T, R> params_type;
     BOOST_GRAPH_DECLARE_CONVERTED_PARAMETERS(params_type, params)
@@ -129,7 +133,8 @@ namespace boost {
 				  arg_pack[_root_vertex | *vertices(g).first],
 				  arg_pack[_predecessor_map],
 				  arg_pack[_weight_map | static_property_map<double>(1.)],
-				  boost::detail::make_color_map_from_arg_pack(g, arg_pack));
+				  boost::detail::make_color_map_from_arg_pack(g, arg_pack),
+				  verbose);
   }
 }
 

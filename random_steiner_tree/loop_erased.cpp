@@ -33,7 +33,8 @@ namespace boost {
 						  typename graph_traits<Graph>::vertex_descriptor s,       
 						  PredMap pred,
 						  ColorMap color,
-						  NextEdge next_edge) {
+						  NextEdge next_edge,
+						  bool verbose) {
       typedef typename graph_traits<Graph>::vertex_descriptor vertex_descriptor;
 
       BOOST_ASSERT (num_vertices(g) >= 1); // g must also be undirected (or symmetric) and connected
@@ -46,11 +47,15 @@ namespace boost {
       put(color, s, color_gen::black());
       put(pred, s, graph_traits<Graph>::null_vertex());
 
-      // clock_t t;
-      // BGL_FORALL_VERTICES_T(v, g, Graph) {
-      // std::cout << "root is " << (int)s << std::endl;
+      clock_t t;
+	
+      if(verbose){
+	std::cout << "root is " << (int)s << std::endl;
+      }
       for(auto v: X) {
-	// t = clock();
+	if (verbose)
+	  t = clock();
+
         if (get(color, v) != color_gen::white()) continue;
         loop_erased_random_walk(g, v, next_edge, color, path);
         for (typename std::vector<vertex_descriptor>::const_reverse_iterator i = path.rbegin();
@@ -63,53 +68,60 @@ namespace boost {
           put(color, *j, color_gen::black());
           put(pred, *j, *i);
         }
-	// t = clock() - t;
-	// std::cout << "CPP: connecting node {" << v << "} took {" << (float) t / CLOCKS_PER_SEC << "} secs" << std::endl;
+	if (verbose){
+	  t = clock() - t;
+	  std::cout << "CPP: connecting node {" << v << "} took {" << (float) t / CLOCKS_PER_SEC << "} secs" << std::endl;
+	}
       }
-      // std::cout << std::endl;
-      // std::cout << std::endl;
+      if (verbose) {
+	std::cout << std::endl;
+      }
     }
   }
 
   template <typename Graph, typename Gen, typename PredMap, typename ColorMap>
   void loop_erased_random_steiner_tree(const Graph& g,
-  			   std::vector<typename graph_traits<Graph>::vertex_descriptor> X,
-  			   Gen& gen,
-  			   typename graph_traits<Graph>::vertex_descriptor root,
-  			   PredMap pred,
-  			   static_property_map<double>,
-  			   ColorMap color) {
+				       std::vector<typename graph_traits<Graph>::vertex_descriptor> X,
+				       Gen& gen,
+				       typename graph_traits<Graph>::vertex_descriptor root,
+				       PredMap pred,
+				       static_property_map<double>,
+				       ColorMap color,
+				       bool verbose) {
     unweighted_random_out_edge_gen<Graph, Gen> random_oe(gen);
-    detail::loop_erased_random_steiner_tree_internal(g, X, root, pred, color, random_oe);
+    detail::loop_erased_random_steiner_tree_internal(g, X, root, pred, color, random_oe, verbose);
   }
 
   // Compute a weight-distributed spanning tree on a graph.
   template <typename Graph, typename Gen, typename PredMap, typename WeightMap, typename ColorMap>
   void loop_erased_random_steiner_tree(const Graph& g,
-			   std::vector<typename graph_traits<Graph>::vertex_descriptor> X,
-			   Gen& gen,
-			   typename graph_traits<Graph>::vertex_descriptor root,
-			   PredMap pred,
-			   WeightMap weight,
-			   ColorMap color) {
+				       std::vector<typename graph_traits<Graph>::vertex_descriptor> X,
+				       Gen& gen,
+				       typename graph_traits<Graph>::vertex_descriptor root,
+				       PredMap pred,
+				       WeightMap weight,
+				       ColorMap color,
+				       bool verbose) {
     weighted_random_out_edge_gen<Graph, WeightMap, Gen> random_oe(weight, gen);
-    detail::loop_erased_random_steiner_tree_internal(g, X, root, pred, color, random_oe);
+    detail::loop_erased_random_steiner_tree_internal(g, X, root, pred, color, random_oe, verbose);
   }
 
   template <typename Graph, typename Gen, typename P, typename T, typename R>
   void loop_erased_random_steiner_tree(const Graph& g,
-  			   std::vector<typename graph_traits<Graph>::vertex_descriptor> X,
-  			   Gen& gen, const bgl_named_params<P, T, R>& params) {
+				       std::vector<typename graph_traits<Graph>::vertex_descriptor> X,
+				       Gen& gen, const bgl_named_params<P, T, R>& params,
+				       bool verbose) {
     using namespace boost::graph::keywords;
     typedef bgl_named_params<P, T, R> params_type;
     BOOST_GRAPH_DECLARE_CONVERTED_PARAMETERS(params_type, params)
-    loop_erased_random_steiner_tree(g,
-  			X, 
-  			gen,
-  			arg_pack[_root_vertex | *vertices(g).first],
-  			arg_pack[_predecessor_map],
-  			arg_pack[_weight_map | static_property_map<double>(1.)],
-  			boost::detail::make_color_map_from_arg_pack(g, arg_pack));
+      loop_erased_random_steiner_tree(g,
+				      X, 
+				      gen,
+				      arg_pack[_root_vertex | *vertices(g).first],
+				      arg_pack[_predecessor_map],
+				      arg_pack[_weight_map | static_property_map<double>(1.)],
+				      boost::detail::make_color_map_from_arg_pack(g, arg_pack),
+				      verbose);
   }
 }
 

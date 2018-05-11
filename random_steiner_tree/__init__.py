@@ -2,7 +2,7 @@ import random
 from .interface import loop_erased, cut_based
 
 
-def random_steiner_tree(gi, X, root, method="loop_erased", seed=None):
+def random_steiner_tree(gi, X, root, method="loop_erased", seed=None, verbose=False):
     assert method in {"loop_erased", "closure", "cut"}
     # C++ is strict with type...
     X = list(map(int, X))
@@ -11,8 +11,8 @@ def random_steiner_tree(gi, X, root, method="loop_erased", seed=None):
     if seed is None:
         seed = random.randint(0, 2147483647)  # int32
     if method == "loop_erased":
-        return loop_erased(gi, X, root, seed)
+        return loop_erased(gi, X, root, seed, verbose)
     elif method == "cut":
-        return cut_based(gi, X, root, seed)
+        return cut_based(gi, X, root, seed, verbose)
     else:
         raise NotImplemented('yet')

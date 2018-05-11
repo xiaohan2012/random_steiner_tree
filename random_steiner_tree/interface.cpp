@@ -148,7 +148,7 @@ boost::python::list _vertices(Graph & g){
   return nodes;
 }
 
-boost::python::list loop_erased(Graph & g, boost::python::list terminals, int root, int seed){
+boost::python::list loop_erased(Graph & g, boost::python::list terminals, int root, int seed, bool verbose){
   long length = len(terminals);
   std::vector<Vertex> X(length);
   for(long i=0; i<length; i++){
@@ -168,7 +168,8 @@ boost::python::list loop_erased(Graph & g, boost::python::list terminals, int ro
 				  (Vertex) root,
 				  boost::make_iterator_property_map(predmap.begin(), get(boost::vertex_index, g)),
 				  weightmap,
-				  boost::make_iterator_property_map(colormap.begin(), get(boost::vertex_index, g)));
+				  boost::make_iterator_property_map(colormap.begin(), get(boost::vertex_index, g)),
+				  verbose);
   
   boost::python::list l;
   typedef boost::graph_traits<Graph>::vertex_iterator vertex_iter;
@@ -183,7 +184,7 @@ boost::python::list loop_erased(Graph & g, boost::python::list terminals, int ro
 }
 
 
-boost::python::list cut_based(Graph & g, boost::python::list terminals, int root, int seed){
+boost::python::list cut_based(Graph & g, boost::python::list terminals, int root, int seed, bool verbose){
   long length = len(terminals);
   std::vector<Vertex> X(length);
   for(long i=0; i<length; i++){
@@ -203,7 +204,8 @@ boost::python::list cut_based(Graph & g, boost::python::list terminals, int root
 				(Vertex) root,
 				boost::make_iterator_property_map(predmap.begin(), get(boost::vertex_index, g)),
 				weightmap,
-				boost::make_iterator_property_map(colormap.begin(), get(boost::vertex_index, g)));
+				boost::make_iterator_property_map(colormap.begin(), get(boost::vertex_index, g)),
+				verbose);
   
   boost::python::list l;
   typedef boost::graph_traits<Graph>::vertex_iterator vertex_iter;
