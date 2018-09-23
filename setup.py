@@ -7,15 +7,15 @@ os.environ["CXX"] = "g++"
 
 core_module = Extension(
     'random_steiner_tree/interface',
-    include_dirs=['/usr/include/python3.5/'],
-    libraries=['boost_python-py35', 'boost_graph'],
-    library_dirs=['/usr/lib/x86_64-linux-gnu/'],
+    include_dirs=['/usr/include/python3.6m/'],
+    library_dirs=['/lib/'],
+    libraries=['boost_python36', 'boost_graph'],
     extra_compile_args=['-std=c++11', '-O2', '-Wall'],
     extra_link_args=['-Wl,--export-dynamic'],
     sources=['random_steiner_tree/interface.cpp']
 )
 
-setup(name='rand_steiner_tree',
+setup(name='random_steiner_tree',
       version='0.1',
       description='Random Steiner tree sampling algorithm',
       url='http://github.com/xiaohan2012/random_steiner_tree',
